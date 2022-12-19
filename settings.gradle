@@ -1,0 +1,3 @@
+rootProject.name = 'help-me'
+include 'module-api'
+include 'module-core'
