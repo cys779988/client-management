@@ -1,7 +1,10 @@
 package dev.be.customer.web;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +33,31 @@ public class CustomerController {
 	})
 	public ResponseEntity<?> regist(@RequestBody CustomerRequest request) {
 		customerService.regist(request);
+		return ResponseEntity.ok("");
+	}
+	
+	@PutMapping("/{id}")
+	@Operation(summary = "modify", description = "고객정보 수정")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "OK"),
+		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
+		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
+	})
+	public ResponseEntity<?> modify(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
+		request.setId(id);
+		customerService.modify(request);
+		return ResponseEntity.ok("");
+	}
+	
+	@DeleteMapping("/{id}")
+	@Operation(summary = "delete", description = "고객정보 삭제")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "OK"),
+		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
+		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
+	})
+	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+		customerService.delete(id);
 		return ResponseEntity.ok("");
 	}
 }

@@ -1,8 +1,10 @@
 package dev.be.customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,6 +32,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.be.customer.service.dto.RepresentiveMember;
+import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.CustomerType;
+import dev.be.repository.CustomerRepository;
 
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
@@ -48,6 +53,9 @@ class CustomerMvcTest {
 	
 	@Autowired
 	private MockMvc mockMvc;
+	
+	@Autowired
+	private CustomerRepository customerRepository;
 	
     @Test
     @DisplayName("한국인 고객 등록 유효성검사 테스트")
@@ -251,6 +259,47 @@ class CustomerMvcTest {
     	
     	mockMvc.perform(post("/customer")
     			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @DisplayName("일반 고객 정보 수정")
+    public void modifyCustomerTest() throws Exception {
+    	customerRepository.save(CustomerEntity.builder()
+        		.type(CustomerType.FOREIGN_CORPORATION)
+        		.name(NAME)
+        		.englishName("test")
+        		.birthDate("1994-11-11")
+        		.nationality("미국")
+        		.email(EMAIL)
+        		.address(ADDRESS)
+        		.contact(CONTACT)
+        		.build());
+    	
+    	Map<String, String> param = new HashMap<>();
+    	param.put("name", NAME);
+    	param.put("birthDate", "1994-11-11");
+    	param.put("type", "FOREIGN");
+    	param.put("email", EMAIL);
+    	param.put("address", ADDRESS);
+    	param.put("contact", CONTACT);
+    	
+    	mockMvc.perform(put("/customer/1")
+    			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isOk());
+    }
+    
+    @Test
+    @DisplayName("고객 정보 삭제 실패")
+    public void deleteCustomerFailTest() throws Exception {
+    	
+    	mockMvc.perform(delete("/customer/1")
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())
