@@ -51,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.successHandler(customAuthenticationSuccessHandler)
 			.failureHandler(customAuthenticationFailureHandler);
 		http.authorizeRequests()
-				.antMatchers("/user/**", "/login", "/h2-console").permitAll()
+				.antMatchers("/user/**", "/login", "/h2-console/**").permitAll()
 				.anyRequest().authenticated()
 			.and()
 				.logout()
