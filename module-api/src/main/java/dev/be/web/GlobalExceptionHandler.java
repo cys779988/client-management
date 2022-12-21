@@ -1,10 +1,15 @@
 package dev.be.web;
 
+import java.util.List;
+
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -25,6 +30,20 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+			MethodArgumentNotValidException e) {
+		ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	protected ResponseEntity<ErrorResponse> handleConstraintViolationException(
+			ConstraintViolationException e) {
+		ErrorResponse response = ErrorResponse.of(e);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
 		MethodArgumentTypeMismatchException e) {
