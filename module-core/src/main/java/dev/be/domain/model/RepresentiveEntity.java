@@ -21,7 +21,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "customer")
+@Table(name = "representive")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RepresentiveEntity extends BaseTimeEntity {
