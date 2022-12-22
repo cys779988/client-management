@@ -1,5 +1,6 @@
 package dev.be.customer.web;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +32,9 @@ public class CustomerController {
 		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
 		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
 	})
-	public ResponseEntity<?> regist(@RequestBody CustomerRequest request) {
+	public ResponseEntity<Void> regist(@RequestBody CustomerRequest request) {
 		customerService.regist(request);
-		return ResponseEntity.ok("");
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 	@PutMapping("/{id}")
@@ -43,10 +44,10 @@ public class CustomerController {
 		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
 		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
 	})
-	public ResponseEntity<?> modify(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
+	public ResponseEntity<Void> modify(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
 		request.setId(id);
 		customerService.modify(request);
-		return ResponseEntity.ok("");
+		return ResponseEntity.ok().build();
 	}
 	
 	@DeleteMapping("/{id}")
@@ -56,8 +57,8 @@ public class CustomerController {
 		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
 		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
 	})
-	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+	public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
 		customerService.delete(id);
-		return ResponseEntity.ok("");
+		return ResponseEntity.noContent().build();
 	}
 }

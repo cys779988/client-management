@@ -2,6 +2,7 @@ package dev.be.auth.web;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +31,9 @@ public class AuthController {
 		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
 		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
 	})
-	public ResponseEntity<?> signUp(@Valid @RequestBody JoinRequest request) {
-		return ResponseEntity.ok(authService.signUp(request));
+	public ResponseEntity<Void> signUp(@Valid @RequestBody JoinRequest request) {
+		authService.signUp(request);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 }
