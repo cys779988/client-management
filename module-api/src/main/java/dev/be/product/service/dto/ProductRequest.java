@@ -27,10 +27,12 @@ public class ProductRequest {
 	
 	@NotNull(message = "재고 수량은 필수값입니다.")
 	@Min(value = 1, message = "재고 수량을 1개 이상으로 입력해주세요.")
+	@Schema(description = "제품재고", example = "10")
 	private Long quantity;
 	
 	@NotNull(message = "금액은 필수값입니다.")
 	@Min(value = 1, message = "금액은 1원 이상으로 입력해주세요.")
+	@Schema(description = "제품금액", example = "10000")
 	private BigInteger price;
 	
 	public ProductEntity toEntity() {

@@ -1,9 +1,13 @@
 package dev.be.product.service;
 
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import dev.be.domain.model.PageResponse;
+import dev.be.domain.model.ProductEntity;
 import dev.be.exception.BusinessException;
 import dev.be.exception.ErrorCode;
 import dev.be.product.service.dto.ProductRequest;
@@ -29,6 +33,11 @@ public class ProductService {
 		} catch (EmptyResultDataAccessException e) {
 			throw new BusinessException(ErrorCode.EMPTY_RESULT_DATA_ACCESS);
 		}
+	}
+
+	public PageResponse<ProductEntity> getProducts(Pageable page) {
+		Page<ProductEntity> pageProductEntity = productRepository.findAll(page);
+		return PageResponse.of(pageProductEntity.getContent(), page.getPageNumber(), pageProductEntity.getTotalElements());
 	}
 
 }

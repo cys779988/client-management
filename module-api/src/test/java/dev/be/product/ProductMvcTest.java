@@ -1,16 +1,11 @@
 package dev.be.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.mockito.Mockito.*;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -182,5 +177,17 @@ class ProductMvcTest {
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())
     	.andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @DisplayName("제품조회 테스트")
+    public void productFindTest() throws Exception {
+    	
+    	mockMvc.perform(get("/product")
+    			.param("page", "1")
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isOk());
     }
 }
