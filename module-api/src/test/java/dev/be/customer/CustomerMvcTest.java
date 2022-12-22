@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,7 +36,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.be.customer.service.dto.RepresentiveMember;
 import dev.be.domain.model.CustomerEntity;
 import dev.be.domain.model.CustomerType;
+import dev.be.domain.model.RepresentiveEntity;
 import dev.be.repository.CustomerRepository;
+import dev.be.repository.RepresentiveRepository;
 
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
@@ -56,6 +60,9 @@ class CustomerMvcTest {
 	
 	@Autowired
 	private CustomerRepository customerRepository;
+
+	@Autowired
+	private RepresentiveRepository representiveRepository;
 	
     @Test
     @DisplayName("한국인 고객 등록 유효성검사 테스트")
@@ -74,7 +81,7 @@ class CustomerMvcTest {
         		.contentType(MediaType.APPLICATION_JSON_VALUE)
         		.accept(MediaType.APPLICATION_JSON_VALUE))
 	        .andDo(print())
-			.andExpect(status().isOk());
+			.andExpect(status().isCreated());
     }
     
     @Test
@@ -115,7 +122,7 @@ class CustomerMvcTest {
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())
-    	.andExpect(status().isOk());
+    	.andExpect(status().isCreated());
     }
     
     @Test
@@ -155,7 +162,7 @@ class CustomerMvcTest {
         		.contentType(MediaType.APPLICATION_JSON_VALUE)
         		.accept(MediaType.APPLICATION_JSON_VALUE))
 	        .andDo(print())
-			.andExpect(status().isOk());
+			.andExpect(status().isCreated());
     }
     
     @Test
@@ -219,7 +226,7 @@ class CustomerMvcTest {
         		.contentType(MediaType.APPLICATION_JSON_VALUE)
         		.accept(MediaType.APPLICATION_JSON_VALUE))
 	        .andDo(print())
-			.andExpect(status().isOk());
+			.andExpect(status().isCreated());
     }
     
     @Test
@@ -267,7 +274,7 @@ class CustomerMvcTest {
     
     @Test
     @DisplayName("일반 고객 정보 수정")
-    public void modifyCustomerTest() throws Exception {
+    public void updateCustomerTest() throws Exception {
     	customerRepository.save(CustomerEntity.builder()
         		.type(CustomerType.FOREIGN_CORPORATION)
         		.name(NAME)
@@ -280,9 +287,46 @@ class CustomerMvcTest {
         		.build());
     	
     	Map<String, String> param = new HashMap<>();
-    	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
     	param.put("type", "FOREIGN");
+    	param.put("name", NAME);
+    	param.put("englishName", "test");
+    	param.put("birthDate", "1994-11-11");
+    	param.put("email", EMAIL);
+    	param.put("nationality", "미국");
+    	param.put("address", ADDRESS);
+    	param.put("contact", CONTACT);
+    	
+    	mockMvc.perform(put("/customer/1")
+    			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isOk());
+    }
+    
+    @Test
+    @DisplayName("법인 고객 -> 일반 고객 정보 수정")
+    public void updateCorporationCustomerToCustomerTest() throws Exception {
+    	CustomerEntity customerEntity = customerRepository.save(CustomerEntity.builder()
+    			.type(CustomerType.FOREIGN_CORPORATION)
+    			.name(NAME)
+    			.englishName("test")
+    			.birthDate("1994-11-11")
+    			.nationality("미국")
+    			.email(EMAIL)
+    			.address(ADDRESS)
+    			.contact(CONTACT)
+    			.build());
+    	
+    	representiveRepository.save(RepresentiveEntity.builder().name(NAME).contact(CONTACT).customer(customerEntity).build());
+    	
+    	Map<String, String> param = new HashMap<>();
+    	param.put("id", customerEntity.getId().toString());
+    	param.put("type", "FOREIGN");
+    	param.put("name", NAME);
+    	param.put("englishName", "test");
+    	param.put("birthDate", "1994-11-11");
+    	param.put("nationality", "미국");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
     	param.put("contact", CONTACT);
@@ -296,10 +340,50 @@ class CustomerMvcTest {
     }
     
     @Test
+    @DisplayName("법인 고객 -> 법인 고객 대표법인 정보 수정")
+    public void updateCorporationCustomerUpdateRepresentiveTest() throws Exception {
+    	CustomerEntity customerEntity = customerRepository.save(CustomerEntity.builder()
+    			.type(CustomerType.FOREIGN_CORPORATION)
+    			.name(NAME)
+    			.englishName("test")
+    			.birthDate("1994-11-11")
+    			.nationality("미국")
+    			.email(EMAIL)
+    			.address(ADDRESS)
+    			.contact(CONTACT)
+    			.build());
+    	
+    	RepresentiveEntity representiveEntity = representiveRepository.save(RepresentiveEntity.builder().name(NAME).contact(CONTACT).customer(customerEntity).build());
+    	
+    	Map<String, Object> param = new HashMap<>();
+    	param.put("id", customerEntity.getId().toString());
+    	param.put("type", "FOREIGN_CORPORATION");
+    	param.put("name", NAME);
+    	param.put("englishName", "test");
+    	param.put("birthDate", "1994-11-11");
+    	param.put("nationality", "미국");
+    	param.put("email", EMAIL);
+    	param.put("address", ADDRESS);
+    	param.put("contact", CONTACT);
+    	param.put("representive", Arrays.asList(RepresentiveMember.builder().name(NAME).contact(CONTACT).build()));
+    	param.put("removeRepresentive", Arrays.asList(representiveEntity.getId()));
+    	
+    	String test = objectMapper.writeValueAsString(param);
+    	System.out.println(test);
+    	mockMvc.perform(put("/customer/1")
+    			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isOk());
+    }
+    
+    @Test
     @DisplayName("고객 정보 삭제 실패")
     public void deleteCustomerFailTest() throws Exception {
     	
-    	mockMvc.perform(delete("/customer/1")
+    	mockMvc.perform(delete("/customer")
+    			.param("id", "1")
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())

@@ -110,13 +110,13 @@ class CustomerServiceTest {
     
     @Test
     @DisplayName("법인고객정보 수정")
-    public void modifyCustomer() {
+    public void updateCustomer() {
     	CustomerEntity entity = getCustomer();
     	CustomerRequest request = getSavedCustomerRequest();
     	when(customerRepository.findById(request.getId())).thenReturn(Optional.of(entity));
     	when(customerRepository.save(any(CustomerEntity.class))).thenReturn(entity);
     	
-    	customerService.modify(request);
+    	customerService.update(request);
     }
 }
  
