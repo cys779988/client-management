@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable();
+		http.cors().disable().csrf().disable();
 		http.headers().frameOptions().disable();
 		http.formLogin()
 			.loginPage("/login")
@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.failureHandler(customAuthenticationFailureHandler);
 		http.authorizeRequests()
 				.antMatchers("/user/**", "/login", "/h2-console/**").permitAll()
-				.anyRequest().authenticated()
+				.anyRequest().authenticated().and().httpBasic()
 			.and()
 				.logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
