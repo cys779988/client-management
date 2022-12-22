@@ -1,7 +1,5 @@
 package dev.be.web;
 
-import java.util.List;
-
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.http.HttpStatus;
@@ -25,15 +23,14 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(BindException.class)
 	protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
-		ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE,
-			e.getBindingResult());
+		ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult());
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
 			MethodArgumentNotValidException e) {
-		ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE);
+		ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult());
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
