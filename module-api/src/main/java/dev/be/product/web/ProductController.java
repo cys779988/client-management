@@ -1,9 +1,16 @@
 package dev.be.product.web;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,5 +88,23 @@ public class ProductController {
 	@Parameter(name = "page", example = "2", description = "조회할 페이지 번호")
 	public ResponseEntity<PageResponse<ProductEntity>> getProducts(Pageable page) {
 		return ResponseEntity.ok(productService.getProducts(page));
+	}
+	
+	@GetMapping("/excel")
+	@Operation(summary = "getProductsExcelFile", description = "제품현황 엑셀다운로드")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "OK"),
+		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
+		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
+	})
+	@Parameter(name = "page", example = "2", description = "엑셀다운로드 할 페이지 번호")
+	public ResponseEntity<?> getProductsExcelFile(Pageable page, HttpServletResponse response) throws IOException {
+		InputStreamResource resource = productService.getProductsExcelFile(page);
+		String filename = URLEncoder.encode("제품현황.xlsx", "UTF-8");
+		
+		return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename + "")
+						.contentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+						.body(resource);
 	}
 }
