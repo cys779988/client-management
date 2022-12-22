@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import dev.be.customer.service.dto.CustomerRequest;
 import dev.be.customer.service.dto.RepresentiveMember;
@@ -18,7 +19,6 @@ import dev.be.exception.ErrorCode;
 import dev.be.repository.CustomerRepository;
 import dev.be.repository.RepresentiveRepository;
 import lombok.RequiredArgsConstructor;
-import static dev.be.domain.model.CustomerType.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,42 +36,49 @@ public class CustomerService {
 		CustomerType type = request.getType();
 		CustomerEntity customer = customerRepository.save(request.toEntity());
 		
-		if(type == FOREIGN_CORPORATION || type == KOREAN_CORPORATION) {
-			representiveRegist(customer, request.getRepresentive());
-		}
+		registRepresentive(type, customer, request.getRepresentive());
 		
 		return customer.getId();
 	}
 	
 	@Transactional
-	public void modify(CustomerRequest request) {
+	public void update(@Valid CustomerRequest request) {
 		CustomerType type = request.getType();
 		Long customerId = request.getId();
-		
+		boolean isTypeChangedAndCorporation = false;
 		Optional<CustomerEntity> entityWrapper = customerRepository.findById(customerId);
 		
 		if(entityWrapper.isPresent()) {
-			compareAndDeleteRepresentive(entityWrapper.get().getType(), type, customerId);
+			isTypeChangedAndCorporation = compareAndDeleteRepresentive(entityWrapper.get().getType(), type, customerId);
 		}
 		
 		CustomerEntity customer = customerRepository.save(request.toEntity());
 		
-		if(type == FOREIGN_CORPORATION || type == KOREAN_CORPORATION) {
-			representiveRegist(customer, request.getRepresentive());
-		}
+		deleteRepresentive(isTypeChangedAndCorporation, request.getRemoveRepresentive());
+		
+		registRepresentive(type, customer, request.getRepresentive());
 	}
 	
 	private boolean compareAndDeleteRepresentive(CustomerType beforeType, CustomerType type, Long id) {
-		if(beforeType != type && (beforeType == FOREIGN_CORPORATION || beforeType == KOREAN_CORPORATION)) {
+		if(beforeType != type && beforeType.isCorporation()) {
 			representiveRepository.deleteAllByCustomerId(id);
 			return true;
 		}
 		return false;
 	}
 	
-	private void representiveRegist(CustomerEntity customer, List<RepresentiveMember> representiveList) {
-		List<RepresentiveEntity> representiveEntityList = representiveList.stream().map(i -> i.toEntity(customer)).collect(Collectors.toList());
-		representiveRepository.saveAll(representiveEntityList);
+	private void registRepresentive(CustomerType type, CustomerEntity customer, List<RepresentiveMember> representiveList) {
+		if(type.isCorporation() && !CollectionUtils.isEmpty(representiveList)) {
+			List<RepresentiveEntity> representiveEntityList = representiveList.stream().map(i -> i.toEntity(customer)).collect(Collectors.toList());
+			representiveRepository.saveAll(representiveEntityList);
+		}
+	}
+	
+	private void deleteRepresentive(boolean isTypeChangedAndCorporation, List<Long> list) {
+		if(isTypeChangedAndCorporation == false && !CollectionUtils.isEmpty(list)) {
+			List<RepresentiveEntity> entityList = representiveRepository.findAllById(list);
+			representiveRepository.deleteInBatch(entityList);
+		}
 	}
 
 	public void delete(Long id) {

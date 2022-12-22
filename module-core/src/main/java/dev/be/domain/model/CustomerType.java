@@ -16,4 +16,8 @@ public enum CustomerType {
 	public static CustomerType from(String s) {
 		return CustomerType.valueOf(s.toUpperCase());
 	}
+	
+	public boolean isCorporation() {
+		return this == KOREAN_CORPORATION || this == FOREIGN_CORPORATION;
+	}
 }

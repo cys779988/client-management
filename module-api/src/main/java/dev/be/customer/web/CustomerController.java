@@ -38,26 +38,26 @@ public class CustomerController {
 	}
 	
 	@PutMapping("/{id}")
-	@Operation(summary = "modify", description = "고객정보 수정")
+	@Operation(summary = "update", description = "고객정보 수정")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK"),
 		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
 		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
 	})
-	public ResponseEntity<Void> modify(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
+	public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
 		request.setId(id);
-		customerService.modify(request);
+		customerService.update(request);
 		return ResponseEntity.ok().build();
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping
 	@Operation(summary = "delete", description = "고객정보 삭제")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK"),
 		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
 		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
 	})
-	public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+	public ResponseEntity<Void> delete(Long id) {
 		customerService.delete(id);
 		return ResponseEntity.noContent().build();
 	}

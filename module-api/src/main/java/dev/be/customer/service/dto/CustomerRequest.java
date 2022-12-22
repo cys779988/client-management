@@ -6,6 +6,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import dev.be.customer.validation.CustomerConstarint;
 import dev.be.customer.validation.CustomerMarker;
 import dev.be.customer.validation.RepresentiveMarker;
@@ -62,6 +64,9 @@ public class CustomerRequest {
 	@Valid
 	@NotNull(groups = RepresentiveMarker.class, message = "법인 대표는 필수로 1명이상 등록해야 합니다.")
 	private List<RepresentiveMember> representive;
+	
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	private List<Long> removeRepresentive;
 	
 	public CustomerEntity toEntity() {
 		return CustomerEntity.builder()
