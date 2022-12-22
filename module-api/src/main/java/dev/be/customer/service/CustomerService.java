@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import dev.be.customer.service.dto.CustomerRequest;
+import dev.be.customer.service.dto.CustomerResponse;
 import dev.be.customer.service.dto.RepresentiveMember;
 import dev.be.domain.model.CustomerEntity;
 import dev.be.domain.model.CustomerType;
@@ -83,10 +84,14 @@ public class CustomerService {
 
 	public void delete(Long id) {
 		try {
-			representiveRepository.deleteById(id);
+			customerRepository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
 			throw new BusinessException(ErrorCode.EMPTY_RESULT_DATA_ACCESS);
 		}
+	}
+
+	public List<CustomerResponse> getCustomers() {
+		return customerRepository.findAll().stream().map(CustomerResponse::of).collect(Collectors.toList());
 	}
 
 }

@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -15,9 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import dev.be.customer.service.CustomerService;
 import dev.be.customer.service.dto.CustomerRequest;
+import dev.be.customer.service.dto.CustomerResponse;
 import dev.be.customer.service.dto.RepresentiveMember;
 import dev.be.domain.model.CustomerEntity;
 import dev.be.domain.model.CustomerType;
@@ -117,6 +121,18 @@ class CustomerServiceTest {
     	when(customerRepository.save(any(CustomerEntity.class))).thenReturn(entity);
     	
     	customerService.update(request);
+    }
+    
+    @Test
+    @DisplayName("고객 목록 조회")
+    public void getCustomers() {
+    	CustomerEntity entity = getCustomer();
+    	when(customerRepository.findAll()).thenReturn(Arrays.asList(entity));
+    	
+    	List<CustomerResponse> response = customerService.getCustomers();
+    	
+    	assertThat(CollectionUtils.isEmpty(response), is(false));
+    	assertThat(StringUtils.hasText(response.get(0).getName()), is(true));
     }
 }
  

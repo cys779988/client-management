@@ -1,6 +1,5 @@
 package dev.be.customer;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,11 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -82,6 +75,26 @@ class CustomerMvcTest {
         		.accept(MediaType.APPLICATION_JSON_VALUE))
 	        .andDo(print())
 			.andExpect(status().isCreated());
+    }
+    
+    @Test
+    @DisplayName("한국인 고객 등록 유효성검사 테스트")
+    public void koreanCustomerRegistValidationTest2() throws Exception {
+    	
+    	Map<String, String> param = new HashMap<>();
+    	param.put("name", NAME);
+    	param.put("birthDate", "1994-11-11");
+    	param.put("type", "KOREAN2");
+    	param.put("email", EMAIL);
+    	param.put("address", ADDRESS);
+    	param.put("contact", CONTACT);
+    	
+    	mockMvc.perform(post("/customer")
+    			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isBadRequest());
     }
     
     @Test
@@ -388,5 +401,27 @@ class CustomerMvcTest {
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())
     	.andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @DisplayName("고객 목록 조회")
+    public void getCustomersTest() throws Exception {
+    	customerRepository.save(CustomerEntity.builder()
+    			.type(CustomerType.FOREIGN_CORPORATION)
+    			.name(NAME)
+    			.englishName("test")
+    			.birthDate("1994-11-11")
+    			.nationality("미국")
+    			.email(EMAIL)
+    			.address(ADDRESS)
+    			.contact(CONTACT)
+    			.build());
+    	
+    	mockMvc.perform(get("/customer")
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isOk())
+    	.andReturn();
     }
 }

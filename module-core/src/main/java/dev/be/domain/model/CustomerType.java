@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CustomerType {
-	KOREAN("korean"), KOREAN_CORPORATION("korean_corporation"), FOREIGN("foreign"), FOREIGN_CORPORATION("foreign_corporation");
+	KOREAN("한국인"), KOREAN_CORPORATION("한국법인"), FOREIGN("외국인"), FOREIGN_CORPORATION("외국법인");
 	
-	private final String type;
+	private final String value;
 	
 	@JsonCreator
 	public static CustomerType from(String s) {
