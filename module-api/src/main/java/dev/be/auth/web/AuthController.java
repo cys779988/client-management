@@ -27,9 +27,7 @@ public class AuthController {
 	@PostMapping("/signup")
 	@Operation(summary = "signup", description = "회원가입")
 	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "OK"),
-		@ApiResponse(responseCode = "400", description = "BAD_REQUEST"),
-		@ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR")
+		@ApiResponse(responseCode = "201", description = "OK")
 	})
 	public ResponseEntity<Void> signUp(@Valid @RequestBody JoinRequest request) {
 		authService.signUp(request);

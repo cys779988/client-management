@@ -7,3 +7,8 @@ spring:
   devtools:
     livereload:
       enabled: 'true'
+springdoc:
+  default-produces-media-type: application/json
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha

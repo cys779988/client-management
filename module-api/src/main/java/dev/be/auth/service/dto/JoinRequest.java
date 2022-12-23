@@ -10,13 +10,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Schema(description = "회원가입 요청")
 @Data
 @NoArgsConstructor
 public class JoinRequest {
 
 	@NotBlank(message = "이메일은 필수값입니다.")
 	@Email(message = "이메일 형식에 맞지 않습니다.")
-	@Schema(description = "이메일", example = "hong1@helpme.com")
+	@Schema(description = "이메일", example = "hong1@naver.com")
 	private String email;
 
 	@NotBlank(message = "비밀번호는 필수값입니다.")

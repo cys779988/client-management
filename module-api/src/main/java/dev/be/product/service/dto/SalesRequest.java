@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Schema(description = "제품 판매 내역 등록 요청")
 @Data
 @Builder
 @AllArgsConstructor

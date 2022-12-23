@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Schema(description = "고객 등록 요청")
 @CustomerConstarint
 @Data
 @Builder
@@ -38,7 +39,7 @@ public class CustomerRequest {
 	private String englishName;
 
 	@NotNull(message = "고택 타입은 필수값입니다.")
-    @Schema(description = "고객타입", example = "KOREAN: 한국인, KOREAN_CORPORATION: 한국법인, FOREIGN: 외국인, FOREIGN_CORPORATION: 외국법인")
+    @Schema(description = "고객타입", example = "KOREAN_CORPORATION", enumAsRef = true)
 	private CustomerType type;
     
 	@NotBlank(groups = CustomerMarker.class, message = "외국인의 경우 국적은 필수값입니다.")
@@ -46,7 +47,7 @@ public class CustomerRequest {
     private String nationality;
     
 	@NotBlank(message = "주민등록번호(혹은 생년월일)은 필수값입니다.")
-	@Schema(description = "주민등록번호(혹은 생년월일)", example = "1994-11-11\t\n123456-7897789")
+	@Schema(description = "주민등록번호(혹은 생년월일)", example = "1994-11-11")
     private String birthDate;
     
 	@NotBlank(message = "이메일은 필수값입니다.")
