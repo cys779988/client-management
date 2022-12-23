@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "sales_history", indexes = @Index(name = "idx_customerName", columnList = "customerName"))
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SalesHistoryEntity {
+public class SalesHistoryEntity extends BaseTimeEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
