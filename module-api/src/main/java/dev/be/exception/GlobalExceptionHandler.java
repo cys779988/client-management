@@ -1,4 +1,4 @@
-package dev.be.web;
+package dev.be.exception;
 
 import javax.validation.ConstraintViolationException;
 
@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import dev.be.exception.BusinessException;
-import dev.be.exception.ErrorCode;
-import dev.be.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
