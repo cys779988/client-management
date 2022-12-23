@@ -13,7 +13,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.core.io.InputStreamResource;
 
-public class ExcelUtils {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ExcelUtils {
 	public static <T> InputStreamResource createExcelFileAsStream(List<String> header, List<List<?>> dataList) {
 		try(Workbook workbook = new SXSSFWorkbook();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();) {
