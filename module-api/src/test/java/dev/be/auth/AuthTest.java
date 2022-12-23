@@ -64,7 +64,7 @@ class AuthTest {
 	        		.contentType(MediaType.APPLICATION_JSON_VALUE)
 	        		.accept(MediaType.APPLICATION_JSON_VALUE))
 		        .andDo(print())
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
     }
     
     @Test
@@ -150,7 +150,7 @@ class AuthTest {
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())
-    	.andExpect(status().is(302));
+    	.andExpect(status().isUnauthorized());
     }
     
     
