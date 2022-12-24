@@ -2,7 +2,7 @@ package dev.be.customer.service.dto;
 
 import javax.validation.constraints.NotBlank;
 
-import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.Customer;
 import dev.be.domain.model.RepresentiveEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,10 +23,10 @@ public class RepresentiveMember {
 	@NotBlank(message = "법인대표연락처는 필수값입니다.")
 	private String contact;
 	
-	public RepresentiveEntity toEntity(CustomerEntity customerEntity) {
+	public RepresentiveEntity toEntity(Customer customer) {
 		return RepresentiveEntity.builder()
 								.id(id)
-								.customer(customerEntity)
+								.customer(customer)
 								.name(name)
 								.contact(contact)
 								.build();

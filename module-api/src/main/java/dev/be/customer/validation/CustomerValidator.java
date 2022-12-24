@@ -22,15 +22,16 @@ public class CustomerValidator implements ConstraintValidator<CustomerConstarint
 		
 		switch (value.getType()) {
 		case FOREIGN_CORPORATION:
-			groups = new Class []{CustomerMarker.class, RepresentiveMarker.class};
+			groups = new Class []{ForeignMarker.class, RepresentiveMarker.class};
 			break;
 		case KOREAN_CORPORATION:
-			groups = new Class []{RepresentiveMarker.class};
+			groups = new Class []{KoreanMarker.class, RepresentiveMarker.class};
 			break;
 		case FOREIGN:
-			groups = new Class []{CustomerMarker.class};
+			groups = new Class []{ForeignMarker.class};
 			break;
 		case KOREAN: 
+			groups = new Class []{KoreanMarker.class};
 			break;
 		}
 		

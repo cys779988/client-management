@@ -10,15 +10,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @Entity
 @Table(name = "representive")
@@ -27,13 +31,14 @@ import lombok.Setter;
 public class RepresentiveEntity extends BaseTimeEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="REPRESENTIVE_ID")
 	private Long id;
 	
 	@ManyToOne
 	@JoinColumn(name = "CUSTOMER_ID", referencedColumnName = "CUSTOMER_ID", foreignKey = @ForeignKey(name = "fk_representive_customer"))
-	private CustomerEntity customer;
+	@JsonBackReference
+	private Customer customer;
 	
 	private String name;
 	

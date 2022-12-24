@@ -1,18 +1,26 @@
 package dev.be.customer.service.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import dev.be.customer.validation.CustomerConstarint;
-import dev.be.customer.validation.CustomerMarker;
+import dev.be.customer.validation.ForeignMarker;
+import dev.be.customer.validation.KoreanMarker;
 import dev.be.customer.validation.RepresentiveMarker;
-import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.Customer;
 import dev.be.domain.model.CustomerType;
+import dev.be.domain.model.ForeignCorporationCustomer;
+import dev.be.domain.model.ForeignCustomer;
+import dev.be.domain.model.KoreanCorporationCustomer;
+import dev.be.domain.model.KoreanCustomer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +29,7 @@ import lombok.NoArgsConstructor;
 
 @Schema(description = "고객 등록 요청")
 @CustomerConstarint
-@Data
-@Builder
+@Data@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerRequest {
@@ -34,7 +41,7 @@ public class CustomerRequest {
 	@Schema(description = "한글이름", example = "홍길동")
 	private String name;
 
-	@NotBlank(groups = CustomerMarker.class, message = "외국인의 경우 영문이름은 필수값입니다.")
+	@NotBlank(groups = ForeignMarker.class, message = "외국인의 경우 영문이름은 필수값입니다.")
 	@Schema(description = "영어이름", example = "GilDong Hong")
 	private String englishName;
 
@@ -42,13 +49,18 @@ public class CustomerRequest {
     @Schema(description = "고객타입", example = "KOREAN_CORPORATION", enumAsRef = true)
 	private CustomerType type;
     
-	@NotBlank(groups = CustomerMarker.class, message = "외국인의 경우 국적은 필수값입니다.")
+	@NotBlank(groups = ForeignMarker.class, message = "외국인의 경우 국적은 필수값입니다.")
 	@Schema(description = "국적", example = "미국")
     private String nationality;
     
-	@NotBlank(message = "주민등록번호(혹은 생년월일)은 필수값입니다.")
-	@Schema(description = "주민등록번호(혹은 생년월일)", example = "1994-11-11")
-    private String birthDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(groups = ForeignMarker.class, message = "설립일자(혹은 생년월일)은 필수값입니다.")
+	@Schema(description = "외국인, 외국법인일 경우 설립일자(혹은 생년월일) 등록", example = "1994-11-11")
+    private LocalDate registDate;
+
+	@NotBlank(groups = KoreanMarker.class, message = "주민등록번호(혹은 법인등록번호)은 필수값입니다.")
+	@Schema(description = "한국인, 한국법인일 경우 주민등록번호(혹은 법인등록번호) 등록", example = "1564654-1534534")
+	private String registNumber;
     
 	@NotBlank(message = "이메일은 필수값입니다.")
 	@Schema(description = "이메일", example = "hong@helpme.com")
@@ -69,17 +81,51 @@ public class CustomerRequest {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private List<Long> removeRepresentive;
 	
-	public CustomerEntity toEntity() {
-		return CustomerEntity.builder()
-							.id(id)
-							.name(name)
-							.englishName(englishName)
-							.type(type)
-							.nationality(nationality)
-							.birthDate(birthDate)
-							.email(email)
-							.address(address)
-							.contact(contact)
-							.build();
+	
+	public Customer toEntity() {
+		switch (type) {
+		case KOREAN:
+			return KoreanCustomer.builder()
+					.id(id)
+					.name(name)
+					.address(address)
+					.contact(contact)
+					.email(email)
+					.registNumber(registNumber)
+					.build();
+		case KOREAN_CORPORATION:
+			return KoreanCorporationCustomer.builder()
+					.id(id)
+					.name(name)
+					.address(address)
+					.contact(contact)
+					.email(email)
+					.registrationNumber(registNumber)
+					.build();
+		case FOREIGN:
+			return ForeignCustomer.builder()
+					.id(id)
+					.name(name)
+					.englishName(englishName)
+					.nationality(nationality)
+					.address(address)
+					.contact(contact)
+					.email(email)
+					.birthDate(registDate)
+					.build();
+		case FOREIGN_CORPORATION:
+			return ForeignCorporationCustomer.builder()
+					.id(id)
+					.name(name)
+					.englishName(englishName)
+					.nationality(nationality)
+					.address(address)
+					.contact(contact)
+					.email(email)
+					.registDate(registDate)
+					.build();
+		default:
+			return null;
+		}
 	}
 }

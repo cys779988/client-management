@@ -23,8 +23,9 @@ import dev.be.customer.service.CustomerService;
 import dev.be.customer.service.dto.CustomerRequest;
 import dev.be.customer.service.dto.CustomerResponse;
 import dev.be.customer.service.dto.RepresentiveMember;
-import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.Customer;
 import dev.be.domain.model.CustomerType;
+import dev.be.domain.model.KoreanCorporationCustomer;
 import dev.be.domain.model.RepresentiveEntity;
 import dev.be.repository.CustomerRepository;
 import dev.be.repository.RepresentiveRepository;
@@ -45,7 +46,7 @@ class CustomerServiceTest {
     	CustomerRequest request = CustomerRequest.builder()
     			.type(CustomerType.KOREAN)
     			.address("주소")
-    			.birthDate("1994-11-11")
+    			.registNumber("77777-11111")
     			.contact("010-1111-1111")
     			.email("hong1@help-me.kr")
     			.name("홍길동")
@@ -58,7 +59,7 @@ class CustomerServiceTest {
     			.id(1L)
     			.type(CustomerType.KOREAN)
     			.address("주소")
-    			.birthDate("1994-11-11")
+    			.registNumber("77777-11111")
     			.contact("010-1111-1111")
     			.email("hong1@help-me.kr")
     			.name("홍길동")
@@ -71,7 +72,7 @@ class CustomerServiceTest {
     			.id(1L)
     			.type(CustomerType.KOREAN_CORPORATION)
     			.address("주소")
-    			.birthDate("1994-11-11")
+    			.registNumber("77777-11111")
     			.contact("010-1111-1111")
     			.email("hong1@help-me.kr")
     			.name("홍길동")
@@ -80,12 +81,11 @@ class CustomerServiceTest {
     	return request;
     }
     
-    private CustomerEntity getCustomer() {
-    	CustomerEntity customer = CustomerEntity.builder()
+    private Customer getCustomer() {
+    	Customer customer = KoreanCorporationCustomer.builder()
     			.id(1L)
-    			.type(CustomerType.KOREAN_CORPORATION)
     			.address("주소")
-    			.birthDate("1994-11-11")
+    			.registrationNumber("77777-11111")
     			.contact("010-1111-1111")
     			.email("hong1@help-me.kr")
     			.name("홍길동")
@@ -106,8 +106,8 @@ class CustomerServiceTest {
     @Test
     @DisplayName("고객 등록")
     public void registCustomer() {
-    	CustomerEntity entity = getCustomer();
-    	when(customerRepository.save(any(CustomerEntity.class))).thenReturn(entity);
+    	Customer entity = getCustomer();
+    	when(customerRepository.save(any(Customer.class))).thenReturn(entity);
 
     	assertThat(customerService.regist(getCustomerRequest()), is(entity.getId()));
     }
@@ -115,10 +115,10 @@ class CustomerServiceTest {
     @Test
     @DisplayName("법인고객정보 수정")
     public void updateCustomer() {
-    	CustomerEntity entity = getCustomer();
+    	Customer entity = getCustomer();
     	CustomerRequest request = getSavedCustomerRequest();
     	when(customerRepository.findById(request.getId())).thenReturn(Optional.of(entity));
-    	when(customerRepository.save(any(CustomerEntity.class))).thenReturn(entity);
+    	when(customerRepository.save(any(Customer.class))).thenReturn(entity);
     	
     	customerService.update(request);
     }
@@ -126,7 +126,8 @@ class CustomerServiceTest {
     @Test
     @DisplayName("고객 목록 조회")
     public void getCustomers() {
-    	CustomerEntity entity = getCustomer();
+    	Customer entity = getCustomer();
+    	entity.setType(CustomerType.KOREAN_CORPORATION);
     	when(customerRepository.findAll()).thenReturn(Arrays.asList(entity));
     	
     	List<CustomerResponse> response = customerService.getCustomers();

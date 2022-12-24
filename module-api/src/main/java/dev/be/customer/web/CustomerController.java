@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.be.customer.service.CustomerService;
 import dev.be.customer.service.dto.CustomerRequest;
 import dev.be.customer.service.dto.CustomerResponse;
+import dev.be.domain.model.Customer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -71,5 +72,14 @@ public class CustomerController {
 	})
 	public ResponseEntity<List<CustomerResponse>> getCustomers() {
 		return ResponseEntity.ok(customerService.getCustomers());
+	}
+	
+	@GetMapping("/{id}")
+	@Operation(summary = "getCustomer", description = "고객 정보 조회")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
+	})
+	public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(customerService.getCustomer(id));
 	}
 }

@@ -7,6 +7,8 @@ public enum ErrorCode {
 	INVALID_TYPE_VALUE(400, "C_004", "요청 값의 타입이 잘못되었습니다."),
 	EMPTY_RESULT_DATA_ACCESS(400, "C_005", "삭제할 데이터가 없습니다."),
 	
+	DUPLICATED_CUSTOMER(400, "CU_001", "이미 존재하는 고객입니다."),
+
 	INVALID_CUSTOMER(400, "S_001", "존재하지 않는 고객입니다."),
 	INVALID_PRODUCT(400, "S_002", "존재하지 않는 제품입니다."),
 	EXCEED_QUANTITY(400, "S_003", "제품 재고가 부족합니다."),

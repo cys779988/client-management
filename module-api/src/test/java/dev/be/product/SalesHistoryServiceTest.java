@@ -26,8 +26,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import dev.be.domain.model.CustomerEntity;
-import dev.be.domain.model.CustomerType;
+import dev.be.domain.model.Customer;
+import dev.be.domain.model.KoreanCorporationCustomer;
 import dev.be.domain.model.ProductEntity;
 import dev.be.domain.model.SalesHistoryEntity;
 import dev.be.exception.BusinessException;
@@ -75,12 +75,11 @@ class SalesHistoryServiceTest {
 		return request;
 	}
 	
-    private CustomerEntity getCustomer() {
-    	CustomerEntity customer = CustomerEntity.builder()
+    private Customer getCustomer() {
+    	Customer customer = KoreanCorporationCustomer.builder()
     			.id(1L)
-    			.type(CustomerType.KOREAN_CORPORATION)
     			.address("주소")
-    			.birthDate("1994-11-11")
+    			.registrationNumber("555555-1111111")
     			.contact("010-1111-1111")
     			.email("hong1@help-me.kr")
     			.name("홍길동")

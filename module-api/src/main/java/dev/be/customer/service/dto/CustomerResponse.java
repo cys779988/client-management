@@ -1,6 +1,6 @@
 package dev.be.customer.service.dto;
 
-import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.Customer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,14 +19,14 @@ public class CustomerResponse {
 	@Schema(description = "고객 정보", example = "아마존(amazon@gmail.com)-외국법인")
 	private String name;
 	
-	public static CustomerResponse of(CustomerEntity entity) {
+	public static CustomerResponse of(Customer customer) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(entity.getName());
+		sb.append(customer.getName());
 		sb.append("(");
-		sb.append(entity.getEmail());
+		sb.append(customer.getEmail());
 		sb.append(")-");
-		sb.append(entity.getType().getValue());
+		sb.append(customer.getType().getValue());
 		
-		return new CustomerResponse(entity.getId(), sb.toString());
+		return new CustomerResponse(customer.getId(), sb.toString());
 	}
 }

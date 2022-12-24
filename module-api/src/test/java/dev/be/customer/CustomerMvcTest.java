@@ -7,10 +7,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -27,8 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.be.customer.service.dto.RepresentiveMember;
-import dev.be.domain.model.CustomerEntity;
-import dev.be.domain.model.CustomerType;
+import dev.be.domain.model.Customer;
+import dev.be.domain.model.ForeignCorporationCustomer;
 import dev.be.domain.model.RepresentiveEntity;
 import dev.be.repository.CustomerRepository;
 import dev.be.repository.RepresentiveRepository;
@@ -45,6 +47,9 @@ class CustomerMvcTest {
 	private static final String ADDRESS = "서울특별시 강남구 땡땡 0길 00";
 	private static final String CONTACT = "010-0000-0000";
 	
+	@Autowired
+	private EntityManager em;
+
 	@Autowired
 	private ObjectMapper objectMapper;
 	
@@ -63,7 +68,7 @@ class CustomerMvcTest {
 
     	Map<String, String> param = new HashMap<>();
     	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registNumber", "77777-111111");
     	param.put("type", "KOREAN");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -83,7 +88,7 @@ class CustomerMvcTest {
     	
     	Map<String, String> param = new HashMap<>();
     	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registNumber", "77777-111111");
     	param.put("type", "KOREAN2");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -123,7 +128,7 @@ class CustomerMvcTest {
     	Map<String, String> param = new HashMap<>();
     	param.put("name", NAME);
     	param.put("englishName", "test");
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("nationality", "미국");
     	param.put("type", "FOREIGN");
     	param.put("email", EMAIL);
@@ -163,7 +168,7 @@ class CustomerMvcTest {
 
     	Map<String, Object> param = new HashMap<>();
     	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registNumber", "77777-111111");
     	param.put("type", "KOREAN_CORPORATION");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -184,7 +189,7 @@ class CustomerMvcTest {
     	
     	Map<String, Object> param = new HashMap<>();
     	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registNumber", "77777-111111");
     	param.put("type", "KOREAN_CORPORATION");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -205,7 +210,7 @@ class CustomerMvcTest {
     	
     	Map<String, String> param = new HashMap<>();
     	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registNumber", "77777-111111");
     	param.put("type", "KOREAN_CORPORATION");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -226,7 +231,7 @@ class CustomerMvcTest {
     	Map<String, Object> param = new HashMap<>();
     	param.put("name", NAME);
     	param.put("englishName", "test");
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("type", "FOREIGN_CORPORATION");
     	param.put("nationality", "미국");
     	param.put("email", EMAIL);
@@ -249,7 +254,7 @@ class CustomerMvcTest {
     	Map<String, Object> param = new HashMap<>();
     	param.put("name", NAME);
     	param.put("englishName", "test");
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("type", "FOREIGN_CORPORATION");
     	param.put("nationality", "미국");
     	param.put("email", EMAIL);
@@ -271,7 +276,7 @@ class CustomerMvcTest {
     	
     	Map<String, String> param = new HashMap<>();
     	param.put("name", NAME);
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("type", "FOREIGN_CORPORATION");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -288,11 +293,10 @@ class CustomerMvcTest {
     @Test
     @DisplayName("일반 고객 정보 수정")
     public void updateCustomerTest() throws Exception {
-    	customerRepository.save(CustomerEntity.builder()
-        		.type(CustomerType.FOREIGN_CORPORATION)
+    	Customer customerEntity = customerRepository.save(ForeignCorporationCustomer.builder()
         		.name(NAME)
         		.englishName("test")
-        		.birthDate("1994-11-11")
+        		.registDate(LocalDate.of(1994, 11, 11))
         		.nationality("미국")
         		.email(EMAIL)
         		.address(ADDRESS)
@@ -303,13 +307,13 @@ class CustomerMvcTest {
     	param.put("type", "FOREIGN");
     	param.put("name", NAME);
     	param.put("englishName", "test");
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("email", EMAIL);
     	param.put("nationality", "미국");
     	param.put("address", ADDRESS);
     	param.put("contact", CONTACT);
     	
-    	mockMvc.perform(put("/customer/1")
+    	mockMvc.perform(put("/customer/" + customerEntity.getId().toString())
     			.content(objectMapper.writeValueAsString(param))
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
@@ -320,11 +324,10 @@ class CustomerMvcTest {
     @Test
     @DisplayName("법인 고객 -> 일반 고객 정보 수정")
     public void updateCorporationCustomerToCustomerTest() throws Exception {
-    	CustomerEntity customerEntity = customerRepository.save(CustomerEntity.builder()
-    			.type(CustomerType.FOREIGN_CORPORATION)
+    	Customer customerEntity = customerRepository.save(ForeignCorporationCustomer.builder()
     			.name(NAME)
     			.englishName("test")
-    			.birthDate("1994-11-11")
+    			.registDate(LocalDate.of(1994, 11, 11))
     			.nationality("미국")
     			.email(EMAIL)
     			.address(ADDRESS)
@@ -334,17 +337,16 @@ class CustomerMvcTest {
     	representiveRepository.save(RepresentiveEntity.builder().name(NAME).contact(CONTACT).customer(customerEntity).build());
     	
     	Map<String, String> param = new HashMap<>();
-    	param.put("id", customerEntity.getId().toString());
     	param.put("type", "FOREIGN");
     	param.put("name", NAME);
     	param.put("englishName", "test");
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("nationality", "미국");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
     	param.put("contact", CONTACT);
     	
-    	mockMvc.perform(put("/customer/1")
+    	mockMvc.perform(put("/customer/" + customerEntity.getId().toString())
     			.content(objectMapper.writeValueAsString(param))
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
@@ -355,11 +357,10 @@ class CustomerMvcTest {
     @Test
     @DisplayName("법인 고객 -> 법인 고객 대표법인 정보 수정")
     public void updateCorporationCustomerUpdateRepresentiveTest() throws Exception {
-    	CustomerEntity customerEntity = customerRepository.save(CustomerEntity.builder()
-    			.type(CustomerType.FOREIGN_CORPORATION)
+    	Customer customerEntity = customerRepository.save(ForeignCorporationCustomer.builder()
     			.name(NAME)
     			.englishName("test")
-    			.birthDate("1994-11-11")
+    			.registDate(LocalDate.of(1994, 11, 11))
     			.nationality("미국")
     			.email(EMAIL)
     			.address(ADDRESS)
@@ -369,11 +370,10 @@ class CustomerMvcTest {
     	RepresentiveEntity representiveEntity = representiveRepository.save(RepresentiveEntity.builder().name(NAME).contact(CONTACT).customer(customerEntity).build());
     	
     	Map<String, Object> param = new HashMap<>();
-    	param.put("id", customerEntity.getId().toString());
     	param.put("type", "FOREIGN_CORPORATION");
     	param.put("name", NAME);
     	param.put("englishName", "test");
-    	param.put("birthDate", "1994-11-11");
+    	param.put("registDate", "1994-11-11");
     	param.put("nationality", "미국");
     	param.put("email", EMAIL);
     	param.put("address", ADDRESS);
@@ -381,9 +381,7 @@ class CustomerMvcTest {
     	param.put("representive", Arrays.asList(RepresentiveMember.builder().name(NAME).contact(CONTACT).build()));
     	param.put("removeRepresentive", Arrays.asList(representiveEntity.getId()));
     	
-    	String test = objectMapper.writeValueAsString(param);
-    	System.out.println(test);
-    	mockMvc.perform(put("/customer/1")
+    	mockMvc.perform(put("/customer/" + customerEntity.getId().toString())
     			.content(objectMapper.writeValueAsString(param))
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
@@ -406,16 +404,18 @@ class CustomerMvcTest {
     @Test
     @DisplayName("고객 목록 조회")
     public void getCustomersTest() throws Exception {
-    	customerRepository.save(CustomerEntity.builder()
-    			.type(CustomerType.FOREIGN_CORPORATION)
+    	customerRepository.save(ForeignCorporationCustomer.builder()
     			.name(NAME)
     			.englishName("test")
-    			.birthDate("1994-11-11")
+    			.registDate(LocalDate.of(1994, 11, 11))
     			.nationality("미국")
     			.email(EMAIL)
     			.address(ADDRESS)
     			.contact(CONTACT)
     			.build());
+    	
+    	em.flush();
+    	em.clear();
     	
     	mockMvc.perform(get("/customer")
     			.contentType(MediaType.APPLICATION_JSON_VALUE)

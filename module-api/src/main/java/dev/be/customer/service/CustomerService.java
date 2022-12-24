@@ -11,8 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import dev.be.customer.service.dto.CustomerRequest;
 import dev.be.customer.service.dto.CustomerResponse;
-import dev.be.customer.service.dto.RepresentiveMember;
-import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.Customer;
 import dev.be.domain.model.CustomerType;
 import dev.be.domain.model.RepresentiveEntity;
 import dev.be.exception.BusinessException;
@@ -34,49 +33,68 @@ public class CustomerService {
 	
 	@Transactional
 	public Long regist(@Valid CustomerRequest request) {
-		CustomerType type = request.getType();
-		CustomerEntity customer = customerRepository.save(request.toEntity());
+		if(isDuplicatedCondition(request)) {
+			throw new BusinessException(ErrorCode.DUPLICATED_CUSTOMER);
+		}
 		
-		registRepresentive(type, customer, request.getRepresentive());
+		Customer customer = customerRepository.save(request.toEntity());
+
+		registRepresentive(request, customer);
 		
 		return customer.getId();
 	}
 	
-	@Transactional
-	public void update(@Valid CustomerRequest request) {
+	private boolean isDuplicatedCondition(CustomerRequest request) {
 		CustomerType type = request.getType();
-		Long customerId = request.getId();
-		boolean isTypeChangedAndCorporation = false;
-		Optional<CustomerEntity> entityWrapper = customerRepository.findById(customerId);
 		
-		if(entityWrapper.isPresent()) {
-			isTypeChangedAndCorporation = compareAndDeleteRepresentive(entityWrapper.get().getType(), type, customerId);
-		}
-		
-		CustomerEntity customer = customerRepository.save(request.toEntity());
-		
-		deleteRepresentive(isTypeChangedAndCorporation, request.getRemoveRepresentive());
-		
-		registRepresentive(type, customer, request.getRepresentive());
-	}
-	
-	private boolean compareAndDeleteRepresentive(CustomerType beforeType, CustomerType type, Long id) {
-		if(beforeType != type && beforeType.isCorporation()) {
-			representiveRepository.deleteAllByCustomerId(id);
-			return true;
+		switch (type) {
+		case KOREAN:
+			return customerRepository.findByNameAndResidentNumber(request.getName(), request.getRegistNumber()).isPresent();
+		case FOREIGN:
+			return customerRepository.findByNameAndRegistrationNumber(request.getName(), request.getRegistNumber()).isPresent();
+		case KOREAN_CORPORATION:
+			return customerRepository.findByNameAndBirthDate(request.getName(), request.getRegistDate()).isPresent();
+		case FOREIGN_CORPORATION:
+			return customerRepository.findByNameAndEstablishmentDate(request.getName(), request.getRegistDate()).isPresent();
 		}
 		return false;
 	}
+
+	@Transactional
+	public void update(@Valid CustomerRequest request) {
+		Optional<Customer> entityWrapper = customerRepository.findById(request.getId());
+		
+		if(!entityWrapper.isPresent()) {
+			throw new BusinessException(ErrorCode.INVALID_CUSTOMER);
+		}
+		
+		Customer customer = request.toEntity();
+		
+		if(compareCustomerTypeAndDeleteCustomer(request, customer, entityWrapper.get())) {
+			deleteRepresentive(request.getRemoveRepresentive());
+		}
+		
+		customer = customerRepository.save(customer);
+		registRepresentive(request, customer);
+	}
 	
-	private void registRepresentive(CustomerType type, CustomerEntity customer, List<RepresentiveMember> representiveList) {
-		if(type.isCorporation() && !CollectionUtils.isEmpty(representiveList)) {
-			List<RepresentiveEntity> representiveEntityList = representiveList.stream().map(i -> i.toEntity(customer)).collect(Collectors.toList());
+	private boolean compareCustomerTypeAndDeleteCustomer(CustomerRequest request, Customer customer, Customer beforeEntity) {
+		if(beforeEntity.getType() != request.getType()) {
+			customerRepository.delete(beforeEntity);
+			return false;
+		}
+		return true;
+	}
+	
+	private void registRepresentive(CustomerRequest request, Customer customer) {
+		if(request.getType().isCorporation()) {
+			List<RepresentiveEntity> representiveEntityList = request.getRepresentive().stream().map(i -> i.toEntity(customer)).collect(Collectors.toList());
 			representiveRepository.saveAll(representiveEntityList);
 		}
 	}
 	
-	private void deleteRepresentive(boolean isTypeChangedAndCorporation, List<Long> list) {
-		if(isTypeChangedAndCorporation == false && !CollectionUtils.isEmpty(list)) {
+	private void deleteRepresentive(List<Long> list) {
+		if(!CollectionUtils.isEmpty(list)) {
 			List<RepresentiveEntity> entityList = representiveRepository.findAllById(list);
 			representiveRepository.deleteInBatch(entityList);
 		}
@@ -92,6 +110,16 @@ public class CustomerService {
 
 	public List<CustomerResponse> getCustomers() {
 		return customerRepository.findAll().stream().map(CustomerResponse::of).collect(Collectors.toList());
+	}
+
+	public Customer getCustomer(Long id) {
+		Optional<Customer> entityWrapper = customerRepository.findById(id);
+		
+		if(!entityWrapper.isPresent()) {
+			throw new BusinessException(ErrorCode.INVALID_CUSTOMER);
+		}
+		
+		return entityWrapper.get();
 	}
 
 }

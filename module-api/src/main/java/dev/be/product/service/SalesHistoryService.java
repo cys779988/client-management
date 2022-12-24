@@ -9,13 +9,12 @@ import java.util.Optional;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import dev.be.domain.model.CustomerEntity;
+import dev.be.domain.model.Customer;
 import dev.be.domain.model.PageResponse;
 import dev.be.domain.model.ProductEntity;
 import dev.be.domain.model.SalesHistoryEntity;
@@ -39,7 +38,7 @@ public class SalesHistoryService {
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public void regist(SalesRequest request) {
 		
-		CustomerEntity customer = isValidCustomerAndReturnEntity(request.getCustomerId());
+		Customer customer = isValidCustomerAndReturnEntity(request.getCustomerId());
 		
 		ProductEntity product = isValidProductAndReturnEntity(request.getProductId());
 
@@ -55,8 +54,8 @@ public class SalesHistoryService {
 													.build());
 	}
 
-	private CustomerEntity isValidCustomerAndReturnEntity(Long customerId) {
-		Optional<CustomerEntity> customerEntityWrapper = customerRepository.findById(customerId);
+	private Customer isValidCustomerAndReturnEntity(Long customerId) {
+		Optional<Customer> customerEntityWrapper = customerRepository.findById(customerId);
 		if(!customerEntityWrapper.isPresent())
 			throw new BusinessException(ErrorCode.INVALID_CUSTOMER);
 		

@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dev.be.domain.model.CustomerEntity;
-import dev.be.domain.model.CustomerType;
+import dev.be.domain.model.Customer;
+import dev.be.domain.model.ForeignCorporationCustomer;
 import dev.be.domain.model.ProductEntity;
 import dev.be.domain.model.SalesHistoryEntity;
 import dev.be.repository.CustomerRepository;
@@ -62,11 +62,10 @@ class SalesHistoryMvcTest {
     @Test
     @DisplayName("제품 판매 내역 등록 테스트")
     public void salesRegistTest() throws Exception {
-    	CustomerEntity customer = customerRepository.saveAndFlush(CustomerEntity.builder()
-														        		.type(CustomerType.FOREIGN_CORPORATION)
+    	Customer customer = customerRepository.saveAndFlush(ForeignCorporationCustomer.builder()
 														        		.name("홍길동")
 														        		.englishName("test")
-														        		.birthDate("1994-11-11")
+														        		.registDate(LocalDate.of(1994, 11, 11))
 														        		.nationality("미국")
 														        		.email("hong@help-me.kr")
 														        		.address("서울특별시 강남구 땡땡")
