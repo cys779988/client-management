@@ -50,9 +50,9 @@ public class CustomerService {
 		switch (type) {
 		case KOREAN:
 			return customerRepository.findByNameAndResidentNumber(request.getName(), request.getRegistNumber()).isPresent();
-		case FOREIGN:
-			return customerRepository.findByNameAndRegistrationNumber(request.getName(), request.getRegistNumber()).isPresent();
 		case KOREAN_CORPORATION:
+			return customerRepository.findByNameAndRegistrationNumber(request.getName(), request.getRegistNumber()).isPresent();
+		case FOREIGN:
 			return customerRepository.findByNameAndBirthDate(request.getName(), request.getRegistDate()).isPresent();
 		case FOREIGN_CORPORATION:
 			return customerRepository.findByNameAndEstablishmentDate(request.getName(), request.getRegistDate()).isPresent();
@@ -108,8 +108,12 @@ public class CustomerService {
 		}
 	}
 
-	public List<CustomerResponse> getCustomers() {
-		return customerRepository.findAll().stream().map(CustomerResponse::of).collect(Collectors.toList());
+	public List<CustomerResponse> getCustomersBasicInfo() {
+		return customerRepository.findAllBy().stream().map(CustomerResponse::of).collect(Collectors.toList());
+	}
+	
+	public List<Customer> getCustomers() {
+		return customerRepository.findAll();
 	}
 
 	public Customer getCustomer(Long id) {

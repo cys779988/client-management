@@ -1,6 +1,7 @@
 package dev.be.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,7 @@ import dev.be.domain.model.ForeignCorporationCustomer;
 import dev.be.domain.model.ForeignCustomer;
 import dev.be.domain.model.KoreanCorporationCustomer;
 import dev.be.domain.model.KoreanCustomer;
+import dev.be.domain.model.CustomerBasicInfoResponse;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long>{
 
@@ -25,4 +27,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>{
 
 	@Query("SELECT DISTINCT c FROM Customer c LEFT JOIN FETCH c.representive WHERE c.id = :id")
 	Optional<Customer> findById(@Param("id") Long id);
+	
+	List<CustomerBasicInfoResponse> findAllBy();
 }

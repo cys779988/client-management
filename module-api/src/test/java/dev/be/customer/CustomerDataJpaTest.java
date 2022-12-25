@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
@@ -124,9 +125,9 @@ class CustomerDataJpaTest {
 		
 		Customer result = customerRepository.save(modifyCustomer);
 		
-		List<Customer> customer = customerRepository.findAll();
+		Optional<Customer> customer = customerRepository.findById(result.getId());
 		
-		assertThat(customer.size(), is(1));
+		assertThat(customer.isPresent(), is(true));
 		assertThat(testCustomer.getType(), is(result.getType()));
 	}
 }

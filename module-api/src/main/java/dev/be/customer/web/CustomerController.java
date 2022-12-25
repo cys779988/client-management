@@ -65,13 +65,13 @@ public class CustomerController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping
-	@Operation(summary = "getCustomers", description = "고객 목록 조회")
+	@GetMapping("/basic")
+	@Operation(summary = "getCustomersBasicInfo", description = "고객 목록 기본정보로 조회")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
 	})
-	public ResponseEntity<List<CustomerResponse>> getCustomers() {
-		return ResponseEntity.ok(customerService.getCustomers());
+	public ResponseEntity<List<CustomerResponse>> getCustomersBasicInfo() {
+		return ResponseEntity.ok(customerService.getCustomersBasicInfo());
 	}
 	
 	@GetMapping("/{id}")

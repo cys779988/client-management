@@ -402,7 +402,7 @@ class CustomerMvcTest {
     }
     
     @Test
-    @DisplayName("고객 목록 조회")
+    @DisplayName("고객 목록 기본정보로 조회")
     public void getCustomersTest() throws Exception {
     	customerRepository.save(ForeignCorporationCustomer.builder()
     			.name(NAME)
@@ -417,7 +417,7 @@ class CustomerMvcTest {
     	em.flush();
     	em.clear();
     	
-    	mockMvc.perform(get("/customer")
+    	mockMvc.perform(get("/customer/basic")
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())
