@@ -11,27 +11,11 @@ import io.swagger.v3.oas.models.info.Info;
 public class SwaggerConfig {
 	
 	@Bean
-	public GroupedOpenApi groupedCustomerApi() {
+	public GroupedOpenApi groupedApi() {
 		return GroupedOpenApi.builder()
-					.group("customer")
-					.pathsToMatch("/customer/**")
+					.group("api")
+					.pathsToMatch("/**")
 					.build();
-	}
-	
-	@Bean
-	public GroupedOpenApi groupedProductApi() {
-		return GroupedOpenApi.builder()
-				.group("product")
-				.pathsToMatch("/product/**", "/sales/**")
-				.build();
-	}
-	
-	@Bean
-	public GroupedOpenApi groupedUserApi() {
-		return GroupedOpenApi.builder()
-				.group("user")
-				.pathsToMatch("/user/**")
-				.build();
 	}
 	
 	@Bean

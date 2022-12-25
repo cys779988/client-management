@@ -43,7 +43,7 @@ public class ProductController {
 	private final ProductService productService;
 	
 	@PostMapping
-	@Operation(summary = "regist", description = "제품정보 등록")
+	@Operation(summary = "regist_product", description = "제품정보 등록")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "OK")
 	})
@@ -53,7 +53,7 @@ public class ProductController {
 	}
 	
 	@PutMapping("/{id}")
-	@Operation(summary = "update", description = "제품정보 수정")
+	@Operation(summary = "update_product", description = "제품정보 수정")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK")
 	})
@@ -65,7 +65,7 @@ public class ProductController {
 	}
 	
 	@DeleteMapping
-	@Operation(summary = "delete", description = "제품정보 삭제")
+	@Operation(summary = "delete_product", description = "제품정보 삭제")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", description = "OK")
 	})
@@ -76,7 +76,7 @@ public class ProductController {
 	}
 	
 	@GetMapping
-	@Operation(summary = "getProducts", description = "제품정보 조회")
+	@Operation(summary = "get_product", description = "제품정보 조회")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PageResponse.class)))
 	})
@@ -86,7 +86,7 @@ public class ProductController {
 	}
 	
 	@GetMapping("/excel")
-	@Operation(summary = "getProductsExcelFile", description = "제품현황 엑셀다운로드")
+	@Operation(summary = "get_product_excelfile", description = "제품현황 엑셀다운로드")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK")
 	})

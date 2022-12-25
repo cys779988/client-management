@@ -40,7 +40,7 @@ public class SalesHistoryController {
 	private final SalesHistoryService salesHistoryService;
 	
 	@PostMapping
-	@Operation(summary = "regist", description = "제품 판매 내역 등록")
+	@Operation(summary = "regist_history", description = "제품 판매 내역 등록")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "OK")
 	})
@@ -50,7 +50,7 @@ public class SalesHistoryController {
 	}
 	
 	@GetMapping
-	@Operation(summary = "getSalesHistory", description = "제품 판매 내역 조회")
+	@Operation(summary = "get_history", description = "제품 판매 내역 조회")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PageResponse.class)))
 	})
@@ -60,7 +60,7 @@ public class SalesHistoryController {
 	}
 	
 	@GetMapping("/excel")
-	@Operation(summary = "getSalesHistoryExcelFile", description = "제품 판매 내역 엑셀다운로드")
+	@Operation(summary = "get_history_excelfile", description = "제품 판매 내역 엑셀다운로드")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK")
 	})

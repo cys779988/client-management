@@ -35,7 +35,7 @@ public class CustomerController {
 	private final CustomerService customerService;
 	
 	@PostMapping
-	@Operation(summary = "regist", description = "고객정보 등록")
+	@Operation(summary = "regist_customer", description = "고객정보 등록")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "OK")
 	})
@@ -45,7 +45,7 @@ public class CustomerController {
 	}
 	
 	@PutMapping("/{id}")
-	@Operation(summary = "update", description = "고객정보 수정")
+	@Operation(summary = "update_customer", description = "고객정보 수정")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK")
 	})
@@ -56,7 +56,7 @@ public class CustomerController {
 	}
 	
 	@DeleteMapping
-	@Operation(summary = "delete", description = "고객정보 삭제")
+	@Operation(summary = "delete_customer", description = "고객정보 삭제")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", description = "OK")
 	})
@@ -66,7 +66,7 @@ public class CustomerController {
 	}
 	
 	@GetMapping("/basic")
-	@Operation(summary = "getCustomersBasicInfo", description = "고객 목록 기본정보로 조회")
+	@Operation(summary = "get_customer_basicinfo", description = "고객 목록 기본정보로 조회")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
 	})
@@ -75,7 +75,7 @@ public class CustomerController {
 	}
 	
 	@GetMapping("/{id}")
-	@Operation(summary = "getCustomer", description = "고객 정보 조회")
+	@Operation(summary = "get_customer", description = "고객 정보 조회")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
 	})
