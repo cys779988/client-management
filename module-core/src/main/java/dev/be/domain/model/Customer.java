@@ -13,12 +13,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -32,7 +31,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "tb_customer")
+@Table(name = "tb_customer", indexes = @Index(name = "idx_customerName", columnList = "name"))
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")

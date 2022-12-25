@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "tb_user")
 public class UserEntity extends BaseTimeEntity{
     @Id
     private String email;

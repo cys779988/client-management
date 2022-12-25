@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "product")
+@Table(name = "tb_product")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductEntity extends BaseTimeEntity {

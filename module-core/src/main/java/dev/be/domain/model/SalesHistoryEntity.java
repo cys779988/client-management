@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @Entity
-@Table(name = "sales_history", indexes = @Index(name = "idx_customerName", columnList = "customerName"))
+@Table(name = "tb_sales_history", indexes = @Index(name = "idx_customerName", columnList = "customerName"))
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SalesHistoryEntity extends BaseTimeEntity {

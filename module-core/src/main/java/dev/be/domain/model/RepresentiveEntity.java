@@ -25,7 +25,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = false)
 @Builder
 @Entity
-@Table(name = "representive")
+@Table(name = "tb_representive")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RepresentiveEntity extends BaseTimeEntity {
