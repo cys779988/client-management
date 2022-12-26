@@ -93,6 +93,66 @@ class SalesHistoryMvcTest {
     }
     
     @Test
+    @DisplayName("제품 판매 내역 등록 재고부족 실패 테스트")
+    public void salesRegistFailTest1() throws Exception {
+    	Customer customer = customerRepository.saveAndFlush(ForeignCorporationCustomer.builder()
+    			.name("홍길동")
+    			.englishName("test")
+    			.registDate(LocalDate.of(1994, 11, 11))
+    			.nationality("미국")
+    			.email("hong@help-me.kr")
+    			.address("서울특별시 강남구 땡땡")
+    			.contact("010-1111-2222")
+    			.build());
+    	
+    	ProductEntity product = productRepository.saveAndFlush(ProductEntity.builder()
+    			.name("좋은제품")
+    			.quantity(10L)
+    			.price(BigInteger.valueOf(1000L))
+    			.build());
+    	
+    	Map<String, Object> param = new HashMap<>();
+    	param.put("customerId", customer.getId());
+    	param.put("productId", product.getId());
+    	param.put("quantity", "11");
+    	param.put("saleDate", "2022-12-20");
+    	
+    	mockMvc.perform(post("/sales")
+    			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @DisplayName("제품 판매 내역 등록 잘못된 제품으로 실패 테스트")
+    public void salesRegistFailTest2() throws Exception {
+    	Customer customer = customerRepository.saveAndFlush(ForeignCorporationCustomer.builder()
+    			.name("홍길동")
+    			.englishName("test")
+    			.registDate(LocalDate.of(1994, 11, 11))
+    			.nationality("미국")
+    			.email("hong@help-me.kr")
+    			.address("서울특별시 강남구 땡땡")
+    			.contact("010-1111-2222")
+    			.build());
+    	
+    	Map<String, Object> param = new HashMap<>();
+    	param.put("customerId", customer.getId());
+    	param.put("productId", 100L);
+    	param.put("quantity", "10");
+    	param.put("saleDate", "2022-12-20");
+    	
+    	mockMvc.perform(post("/sales")
+    			.content(objectMapper.writeValueAsString(param))
+    			.contentType(MediaType.APPLICATION_JSON_VALUE)
+    			.accept(MediaType.APPLICATION_JSON_VALUE))
+    	.andDo(print())
+    	.andExpect(status().isBadRequest());
+    }
+    
+    @Test
     @DisplayName("제품 판매 내역 고객명으로 조회 테스트")
     public void getSalesHistoryTest1() throws Exception {
     	salesHistoryRepository.saveAndFlush(SalesHistoryEntity.builder()

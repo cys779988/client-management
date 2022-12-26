@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +46,13 @@ public class SalesHistoryController {
 		@ApiResponse(responseCode = "201", description = "OK")
 	})
 	public ResponseEntity<Void> regist(@RequestBody @Valid SalesRequest request) {
-		salesHistoryService.regist(request);
+		
+		try {
+			salesHistoryService.regist(request);
+		} catch (ObjectOptimisticLockingFailureException e) {
+			salesHistoryService.regist(request);
+		}
+		
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	

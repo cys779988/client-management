@@ -4,13 +4,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -35,48 +33,32 @@ public class SalesHistoryService {
 	private final ProductRepository productRepository;
 	private final SalesHistoryRepository salesHistoryRepository;
 	
-	@Transactional(isolation = Isolation.REPEATABLE_READ)
-	public void regist(SalesRequest request) {
+	@Transactional
+	public Long regist(SalesRequest request) {
+		Long quantity = request.getQuantity();
 		
-		Customer customer = isValidCustomerAndReturnEntity(request.getCustomerId());
+		Customer customer = customerRepository.findById(request.getCustomerId()).orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CUSTOMER));
 		
-		ProductEntity product = isValidProductAndReturnEntity(request.getProductId());
-
-		BigInteger totalPrice = isValidProductAndSaleProcess(product, request.getQuantity());
+		ProductEntity product = productRepository.findByIdWithOptimisticLock(request.getProductId()).orElseThrow(() -> new BusinessException(ErrorCode.INVALID_PRODUCT));
 		
-		salesHistoryRepository.saveAndFlush(SalesHistoryEntity.builder()
+		try {
+			product.decrease(quantity);
+		} catch (RuntimeException e) {
+			throw new BusinessException(ErrorCode.EXCEED_QUANTITY);
+		}
+		
+		BigInteger totalPrice = BigInteger.valueOf(product.getPrice().intValue() * quantity);
+		
+		Long id = salesHistoryRepository.saveAndFlush(SalesHistoryEntity.builder()
 													.customerName(customer.getName())
 													.email(customer.getEmail())
 													.productName(product.getName())
-													.quantity(request.getQuantity())
+													.quantity(quantity)
 													.price(totalPrice)
 													.saleDate(request.getSaleDate())
-													.build());
-	}
-
-	private Customer isValidCustomerAndReturnEntity(Long customerId) {
-		Optional<Customer> customerEntityWrapper = customerRepository.findById(customerId);
-		if(!customerEntityWrapper.isPresent())
-			throw new BusinessException(ErrorCode.INVALID_CUSTOMER);
+													.build()).getId();
 		
-		return customerEntityWrapper.get();
-	}
-	
-	private ProductEntity isValidProductAndReturnEntity(Long productId) {
-		Optional<ProductEntity> productEntityWrapper = productRepository.findById(productId);
-		if(!productEntityWrapper.isPresent())
-			throw new BusinessException(ErrorCode.INVALID_PRODUCT);
-		
-		return productEntityWrapper.get();
-	}
-
-	private BigInteger isValidProductAndSaleProcess(ProductEntity productEntity, Long quantity) {
-		if(productEntity.getQuantity() < quantity) {
-			throw new BusinessException(ErrorCode.EXCEED_QUANTITY);
-		}
-		productEntity.setQuantity(productEntity.getQuantity() - quantity);
-		productRepository.saveAndFlush(productEntity);
-		return BigInteger.valueOf(productEntity.getPrice().intValue() * quantity);
+		return id;
 	}
 
 	public PageResponse<SalesHistoryEntity> getSalesHistory(Pageable page, SalesHistorySearchRequest request) {

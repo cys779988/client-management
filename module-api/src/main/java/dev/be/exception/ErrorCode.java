@@ -8,6 +8,7 @@ public enum ErrorCode {
 	EMPTY_RESULT_DATA_ACCESS(400, "C_005", "삭제할 데이터가 없습니다."),
 	
 	DUPLICATED_CUSTOMER(400, "CU_001", "이미 존재하는 고객입니다."),
+	DUPLICATED_PRODUCT_NAME(400, "PD_001", "이미 존재하는 제품명입니다."),
 
 	INVALID_CUSTOMER(400, "S_001", "존재하지 않는 고객입니다."),
 	INVALID_PRODUCT(400, "S_002", "존재하지 않는 제품입니다."),

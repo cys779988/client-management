@@ -56,7 +56,7 @@ class ProductMvcTest {
     public void productRegistTest() throws Exception {
 
     	Map<String, String> param = new HashMap<>();
-    	param.put("name", NAME);
+    	param.put("name", "테스트446874345제품");
     	param.put("quantity", "10");
     	param.put("price", "10000");
     	
@@ -124,13 +124,16 @@ class ProductMvcTest {
     @Test
     @DisplayName("제품수정 테스트")
     public void productUpdateTest() throws Exception {
-		
+    	Long id = productRepository.save(ProductEntity.builder().name("테스트제품78331154").quantity(10L).price(BigInteger.valueOf(1000L)).build()).getId();
+    	em.flush();
+    	em.clear();
+    	
 		Map<String, String> param = new HashMap<>();
 		param.put("name", NAME);
 		param.put("quantity", "10");
 		param.put("price", "10000");
 		
-		mockMvc.perform(put("/product/1")
+		mockMvc.perform(put("/product/" + id)
 				.content(objectMapper.writeValueAsString(param))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.accept(MediaType.APPLICATION_JSON_VALUE))
@@ -139,25 +142,9 @@ class ProductMvcTest {
     }
     
     @Test
-    @DisplayName("제품수정 재고 0개 유효성검사 실패 테스트")
-    public void productUpdateVaildationTest() throws Exception {
-    	
-    	Map<String, String> param = new HashMap<>();
-    	param.put("name", NAME);
-    	param.put("price", "10000");
-    	
-    	mockMvc.perform(put("/product/1")
-    			.content(objectMapper.writeValueAsString(param))
-    			.contentType(MediaType.APPLICATION_JSON_VALUE)
-    			.accept(MediaType.APPLICATION_JSON_VALUE))
-    	.andDo(print())
-    	.andExpect(status().isOk());
-    }
-    
-    @Test
     @DisplayName("제품삭제 테스트")
     public void productDeleteTest() throws Exception {
-    	ProductEntity product = productRepository.save(ProductEntity.builder().quantity(10L).price(BigInteger.valueOf(1000L)).build());
+    	ProductEntity product = productRepository.save(ProductEntity.builder().name("테스트제품").quantity(10L).price(BigInteger.valueOf(1000L)).build());
 		
 		mockMvc.perform(delete("/product")
 				.param("id", product.getId().toString())
@@ -172,7 +159,7 @@ class ProductMvcTest {
     public void productDeleteFailTest() throws Exception {
     	
     	mockMvc.perform(delete("/product")
-    			.param("id", "1")
+    			.param("id", "999999")
     			.contentType(MediaType.APPLICATION_JSON_VALUE)
     			.accept(MediaType.APPLICATION_JSON_VALUE))
     	.andDo(print())

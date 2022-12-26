@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.be.domain.model.PageResponse;
 import dev.be.domain.model.ProductEntity;
+import dev.be.exception.BusinessException;
+import dev.be.exception.ErrorCode;
 import dev.be.product.service.ProductService;
 import dev.be.product.service.dto.ProductRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +63,11 @@ public class ProductController {
 	@Parameter(name = "id", example = "10", description = "수정할 제품 ID", required = true)
 	public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody ProductRequest request) {
 		request.setId(id);
-		productService.regist(request);
+		try {
+			productService.update(request);
+		} catch (DataIntegrityViolationException e) {
+			throw new BusinessException(ErrorCode.DUPLICATED_PRODUCT_NAME);
+		}
 		return ResponseEntity.ok().build();
 	}
 	

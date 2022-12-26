@@ -29,9 +29,18 @@ public class ProductService {
 	@Transactional
 	public Long regist(ProductRequest request) {
 		if(productRepository.findByName(request.getName()).isPresent()) {
-			throw new BusinessException(ErrorCode.DUPLICATED_NAME);
+			throw new BusinessException(ErrorCode.DUPLICATED_PRODUCT_NAME);
 		}
 		return productRepository.save(request.toEntity()).getId();
+	}
+	
+	@Transactional
+	public void update(ProductRequest request) {
+		ProductEntity product = productRepository.findById(request.getId()).orElseThrow(() -> new BusinessException(ErrorCode.INVALID_PRODUCT));
+		
+		product.update(request.getName(), request.getQuantity(), request.getPrice());
+		
+		productRepository.save(product).getId();
 	}
 
 	public void delete(Long id) {

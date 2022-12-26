@@ -8,9 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,15 +17,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @Entity
 @Table(name = "tb_product")
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ProductEntity extends BaseTimeEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="PRODUCT_ID")
 	private Long id;
 
@@ -38,4 +35,31 @@ public class ProductEntity extends BaseTimeEntity {
 	
 	@Column(nullable = false)
 	private BigInteger price;
+	
+	@Version
+	private Long version;
+	
+	public void decrease(Long quantity) {
+		if(this.quantity - quantity < 0) {
+			throw new RuntimeException();
+		}
+		
+		this.quantity = this.quantity - quantity;
+	}
+	
+	@Builder
+	public ProductEntity(Long id, String name, Long quantity, BigInteger price) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.quantity = quantity;
+		this.price = price;
+	}
+
+	public void update(String name, Long quantity, BigInteger price) {
+		this.name = name;
+		this.quantity = quantity;
+		this.price = price;
+	}
+	
 }
