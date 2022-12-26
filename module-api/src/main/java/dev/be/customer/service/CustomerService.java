@@ -33,7 +33,7 @@ public class CustomerService {
 	
 	@Transactional
 	public Long regist(@Valid CustomerRequest request) {
-		if(isDuplicatedCondition(request)) {
+		if(isDuplicatedCustomer(request).isPresent()) {
 			throw new BusinessException(ErrorCode.DUPLICATED_CUSTOMER);
 		}
 		
@@ -44,38 +44,42 @@ public class CustomerService {
 		return customer.getId();
 	}
 	
-	private boolean isDuplicatedCondition(CustomerRequest request) {
-		CustomerType type = request.getType();
-		
-		switch (type) {
-		case KOREAN:
-			return customerRepository.findByNameAndResidentNumber(request.getName(), request.getRegistNumber()).isPresent();
-		case KOREAN_CORPORATION:
-			return customerRepository.findByNameAndRegistrationNumber(request.getName(), request.getRegistNumber()).isPresent();
-		case FOREIGN:
-			return customerRepository.findByNameAndBirthDate(request.getName(), request.getRegistDate()).isPresent();
-		case FOREIGN_CORPORATION:
-			return customerRepository.findByNameAndEstablishmentDate(request.getName(), request.getRegistDate()).isPresent();
-		}
-		return false;
-	}
-
 	@Transactional
 	public void update(@Valid CustomerRequest request) {
-		Optional<Customer> entityWrapper = customerRepository.findById(request.getId());
+		Customer entity = customerRepository.findById(request.getId()).orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CUSTOMER));
 		
-		if(!entityWrapper.isPresent()) {
-			throw new BusinessException(ErrorCode.INVALID_CUSTOMER);
+		if(isUpdateDuplicatedCondition(request)) {
+			throw new BusinessException(ErrorCode.DUPLICATED_CUSTOMER);
 		}
 		
 		Customer customer = request.toEntity();
 		
-		if(compareCustomerTypeAndDeleteCustomer(request, entityWrapper.get())) {
+		if(compareCustomerTypeAndDeleteCustomer(request, entity)) {
 			deleteRepresentive(request.getRemoveRepresentive());
 		}
 		
 		registRepresentive(request, customer);
 		customer = customerRepository.save(customer);
+	}
+	
+	private Optional<? extends Customer> isDuplicatedCustomer(CustomerRequest request) {
+		switch (request.getType()) {
+		case KOREAN:
+			return customerRepository.findByNameAndResidentNumber(request.getName(), request.getRegistNumber());
+		case KOREAN_CORPORATION:
+			return customerRepository.findByNameAndRegistrationNumber(request.getName(), request.getRegistNumber());
+		case FOREIGN:
+			return customerRepository.findByNameAndBirthDate(request.getName(), request.getRegistDate());
+		case FOREIGN_CORPORATION:
+			return customerRepository.findByNameAndEstablishmentDate(request.getName(), request.getRegistDate());
+		}
+		
+		return Optional.empty();
+	}
+	
+	private boolean isUpdateDuplicatedCondition( CustomerRequest request) {
+		Optional<? extends Customer> entityWrapper = isDuplicatedCustomer(request);
+		return entityWrapper.isPresent() && entityWrapper.get().getId() != request.getId();
 	}
 	
 	private boolean compareCustomerTypeAndDeleteCustomer(CustomerRequest request, Customer beforeEntity) {
@@ -118,13 +122,7 @@ public class CustomerService {
 	}
 
 	public Customer getCustomer(Long id) {
-		Optional<Customer> entityWrapper = customerRepository.findById(id);
-		
-		if(!entityWrapper.isPresent()) {
-			throw new BusinessException(ErrorCode.INVALID_CUSTOMER);
-		}
-		
-		return entityWrapper.get();
+		return customerRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CUSTOMER));
 	}
 
 }

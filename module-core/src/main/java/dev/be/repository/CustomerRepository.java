@@ -15,7 +15,6 @@ import dev.be.domain.model.ForeignCustomer;
 import dev.be.domain.model.KoreanCorporationCustomer;
 import dev.be.domain.model.KoreanCustomer;
 import dev.be.domain.model.CustomerBasicInfoResponse;
-import dev.be.domain.model.CustomerType;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long>{
 
