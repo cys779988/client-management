@@ -70,17 +70,18 @@ public class CustomerService {
 		
 		Customer customer = request.toEntity();
 		
-		if(compareCustomerTypeAndDeleteCustomer(request, customer, entityWrapper.get())) {
+		if(compareCustomerTypeAndDeleteCustomer(request, entityWrapper.get())) {
 			deleteRepresentive(request.getRemoveRepresentive());
 		}
 		
-		customer = customerRepository.save(customer);
 		registRepresentive(request, customer);
+		customer = customerRepository.save(customer);
 	}
 	
-	private boolean compareCustomerTypeAndDeleteCustomer(CustomerRequest request, Customer customer, Customer beforeEntity) {
+	private boolean compareCustomerTypeAndDeleteCustomer(CustomerRequest request, Customer beforeEntity) {
 		if(beforeEntity.getType() != request.getType()) {
-			customerRepository.delete(beforeEntity);
+			customerRepository.updateCustomerType(request.getId(), request.getType().getValue());
+			representiveRepository.deleteAllByCustomerId(request.getId());
 			return false;
 		}
 		return true;

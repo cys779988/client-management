@@ -5,8 +5,6 @@ import static org.hamcrest.MatcherAssert.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -129,5 +127,25 @@ class CustomerDataJpaTest {
 		
 		assertThat(customer.isPresent(), is(true));
 		assertThat(testCustomer.getType(), is(result.getType()));
+	}
+	
+	@Test
+	@DisplayName("고객 타입 수정")
+	public void updateCustomerType() {
+		Customer foreignCorporationCustomer = getForeignCorporationCustomer();
+		
+		representiveRepository.saveAll(Arrays.asList(new RepresentiveEntity(null, foreignCorporationCustomer, "테스트", "010-111-1533")));
+		Customer customer = customerRepository.saveAndFlush(foreignCorporationCustomer);
+		
+		em.clear();
+		
+		Long id = customer.getId();
+		customerRepository.updateCustomerType(id, CustomerType.KOREAN.getValue());
+		representiveRepository.deleteAllByCustomerId(id);
+		Customer result =  customerRepository.findById(id).get();
+		
+		assertThat(customer.getId(), is(result.getId()));
+		assertThat(CustomerType.KOREAN == result.getType(), is(true));
+		assertThat(CollectionUtils.isEmpty(customer.getRepresentive()), is(true));
 	}
 }

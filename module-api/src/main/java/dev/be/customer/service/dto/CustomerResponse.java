@@ -26,6 +26,6 @@ public class CustomerResponse {
 	private String type;
 	
 	public static CustomerResponse of(CustomerBasicInfoResponse customer) {
-		return new CustomerResponse(customer.getId(), customer.getName(), customer.getEmail(), customer.getType().getValue());
+		return new CustomerResponse(customer.getId(), customer.getName(), customer.getEmail(), customer.getType().getName());
 	}
 }

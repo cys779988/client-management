@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,6 +15,7 @@ import dev.be.domain.model.ForeignCustomer;
 import dev.be.domain.model.KoreanCorporationCustomer;
 import dev.be.domain.model.KoreanCustomer;
 import dev.be.domain.model.CustomerBasicInfoResponse;
+import dev.be.domain.model.CustomerType;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long>{
 
@@ -29,4 +31,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>{
 	Optional<Customer> findById(@Param("id") Long id);
 	
 	List<CustomerBasicInfoResponse> findAllBy();
+	
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query(value = "UPDATE TB_CUSTOMER c SET TYPE = :type WHERE c.CUSTOMER_ID = :customerId", nativeQuery = true)
+	void updateCustomerType(@Param("customerId") Long customerId, @Param("type") String type);
 }

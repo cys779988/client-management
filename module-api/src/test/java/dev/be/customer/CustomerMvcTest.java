@@ -369,6 +369,9 @@ class CustomerMvcTest {
     	
     	RepresentiveEntity representiveEntity = representiveRepository.save(RepresentiveEntity.builder().name(NAME).contact(CONTACT).customer(customerEntity).build());
     	
+    	em.flush();
+    	em.clear();
+    	
     	Map<String, Object> param = new HashMap<>();
     	param.put("type", "FOREIGN_CORPORATION");
     	param.put("name", NAME);
